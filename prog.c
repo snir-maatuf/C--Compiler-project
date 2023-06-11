@@ -11,11 +11,11 @@ int main(int argc, char *argv[]){
 
 
 void proccesingFile(int argc, char *argv[]){
-    int i;
+    int file_index;
 
     /* Checking file is recieved */
     if(argc >= 2){
-        for(i = 1; i < argc; i++)
+        for(file_index = 1; file_index < argc; file_index++)
         {
 
             /* Builds a struct to one file */
@@ -40,7 +40,15 @@ void proccesingFile(int argc, char *argv[]){
 }
 
 void build_structs_file(){
-
+    /* should contains:
+    int IC = 100;
+    int DC = 0;
+    stable_Head?
+    stable_Tail?
+    .
+    .
+    .
+    */
     
 
 }
