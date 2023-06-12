@@ -65,30 +65,3 @@ void printEntriesFile(int i, char *args[], struct symboleTable *tail){
 }
 
 
-/* OR */
-
-
-void printentries(int i, char *argv[], struct Stable *tail) {
-    FILE *fp;
-    char fname[MAX];
-    struct Stable *temp = NULL;
-    
-    sprintf(fname, "%s.ent.txt", argv[i]);
-    
-    fp = fopen(fname, "w");
-    if (fp == NULL) {
-        printf("Failed to open file: %s\n", fname);
-        return;
-    }
-    
-    temp = tail->next;
-    fprintf(fp, "Symbol    Value   BaseAddress   Offset    Attributes\n");
-    while (temp != NULL) {
-        if (temp->attributes[2] > 48) {
-            fprintf(fp, " %-10s%-11d%-12d%-8d%-11s\n", temp->symbol, temp->value, temp->baseaddress, temp->offset, printAttributes(temp));
-        }
-        temp = temp->next;
-    }
-    
-    fclose(fp);
-}
