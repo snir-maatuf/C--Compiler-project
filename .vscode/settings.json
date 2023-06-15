@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "helloworld": "csharp",
+        "errors.h": "c"
+    }
+}
