@@ -10,13 +10,30 @@ struct symbolTable {
     int value;
     int address;
     int offset;
-    char attributes[5];
+    char instructionType[5];
     struct symbolTable* next;
 };
 
-/* Add symbol data to the "Symbol Table" */
-void addSimbolToTable(struct symbolTable * head, char symbol[], int data);
-/*  */
-void addattributes(struct Stable *tail , int type, char symbol[]);
-/* Return which type commmand is the attribute */
-int attributetype(char type[]);
+struct InstructsType {
+    const char *symbolName;
+    int value;
+};
+
+struct InstructsType types[] = {
+        {".data", 0},
+        {".string", 0},
+        {".code", 1},
+        {".entry", 2},
+        {".extern", 3}
+    };
+
+
+
+void addSymbolToTable(struct symbolTable * head, char symbol[], int data);
+void addInstructionToTable( char symbol[] ,int type, struct symbolTable * head );
+int whichInstruct(char type[]);
+const char* printInstructionType(struct symbolTable* tmp);
+void printEntFile(int i, char * argv[], struct symbolTable *tail);
+void printExtFile(int i, char * argv[], struct symbolTable *head);
+int whichInstruct(char type[]);
+int freeSymbol(struct symbolTable *symbol);

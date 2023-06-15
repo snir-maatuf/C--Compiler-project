@@ -1,35 +1,155 @@
 #include "stable.h"
 
 
-void addSimbolToTable(struct symbolTable * head, char symbol[], int data){
-    struct symbolTable *temp = NULL;
+/* Add symbol data to the "Symbol Table" */
+void addSymbolToTable(struct symbolTable * head, char symbol[], int data){
+    struct symbolTable *newSymbol = NULL;
+    struct symbolTable *tmp = NULL;
 
-    temp = (struct symbolTable*)malloc(sizeof(struct symbolTable));
-    strcpy(temp->symbolName,symbol);
-    temp ->value = data;
-    strcpy(temp->attributes,"0000");
-    temp ->address = data - data %16;
-    temp ->offset = data % 16 ;
-    head ->next = temp;
+
+    /* Check if the symbol is already exists */
+    for (tmp = head; tmp!= NULL; tmp = tmp->next){
+        if (!(strcmp(tmp->symbolName, symbol))) {
+            exit(0); /*-------------------- SET ERROR CONST ----------------------- */
+        }
+    }
+    
+    newSymbol = (struct symbolTable*)malloc(sizeof(struct symbolTable));
+
+    if(!head){
+        exit(0);  /*-------------------- SET ERROR CONST ----------------------- */
+    }
+
+    strcpy(newSymbol->symbolName,symbol);
+    strcpy(tmp->instructionType,"0000");
+    newSymbol->value = data;
+    newSymbol->address = data - data %16;
+    tmp->offset = data % 16 ;
+    head->next = tmp;
+
+    /* tmp pointing to the last node that initialize (we did it up) */
+    tmp->next = newSymbol;
+    newSymbol->next = NULL;
 }
 
 
-void addattributes(struct Stable *tail , int type, char symbol[]){
-    struct  Stable *temp = NULL;
 
+/*  Add symbols to the table */
+void addInstructionToTable( char symbol[] ,int type, struct symbolTable * head ){
+    struct symbolTable *newSymbol = NULL;
+    struct symbolTable * tmp = head;
+
+    newSymbol = (struct symbolTable*)malloc(sizeof(struct symbolTable));
+    if (!newSymbol) {
+        fprintf(stderr, "Memory allocation failed.\n"); /*-------------------- SET ERROR CONST ----------------------- */
+        exit(0);
+    }
+    
+
+    if ( !(head) ) {
+        /*  The linked list is empty, so set the new symbol as the head */
+        head = newSymbol;
+    } else {
+        /* Traveling on the linkedlist and append the newSymbol at the end node */
+        while (tmp->next != NULL) {
+            if(!strcmp(tmp ->symbolName,symbol)){
+                tmp = tmp->next;
+                return;
+            }
+        }
+        tmp->next = newSymbol;
+        newSymbol->next=NULL;
+    }
 }
 
 
-int attributetype(char type[]) {
+/* Return instruction of the current symbol node */
+const char* printInstructionType(struct symbolTable* tmp) {
+    static char new[MAX];
+
+    memset(new, '\0', MAX);
+
+    if (tmp->instructionType[0] > '0')
+        strcat(new, "data ");
+    if (tmp->instructionType[1] > '0')
+        strcat(new, "code ");
+    if (tmp->instructionType[2] > '0')
+        strcat(new, "entry ");
+    if (tmp->instructionType[3] > '0')
+        strcat(new, "extern ");
+    return new;
+}
+
+
+/* Prints the entries to a file */
+void printEntFile(int i, char * argv[], struct symbolTable *head){
+    FILE * fp;
+    char fileName[MAX];
+    struct symbolTable * tmp = NULL;
+    char file_type[] = ".ent.txt";
+    
+    /* Store file name with the expected name */
+    strcpy(fileName, argv[i]);
+    strcat(fileName, file_type);
+
+    fp = fopen(fileName, "w");
+    if (fp == NULL) {
+        printf("Failed to open file: %s\n", fileName);/* ---------------------CHANGE ---------------*/
+        return;
+    }
+    
+    tmp = head->next;
+
+    /* Print each instruction and his location in the memory */
+    while( !tmp )
+    {
+        if (tmp->instructionType[2] > '0')
+        {
+            fprintf(fp," %s\t%d\n",tmp->symbolName,tmp->address);
+        }
+        tmp = tmp-> next;
+    }
+
+    fclose(fp);
+}
+
+
+/* Prints the externals to a file */
+void printExtFile(int i, char * argv[], struct symbolTable *head){
+    FILE * fp;
+    char fileName[MAX];
+    struct symbolTable * tmp = NULL;
+    char file_type[] = ".ext.txt";
+    
+    /* Store file name with the expected name */
+    strcpy(fileName, argv[i]);
+    strcat(fileName, file_type);
+
+    fp = fopen(fileName, "w");
+    if (fp == NULL) {
+        printf("Failed to open file: %s\n", fileName);/* ---------------------CHANGE ---------------*/
+        return;
+    }
+    
+    tmp = head->next;
+
+    /* Print each instruction and his location in the memory */
+    while( !tmp )
+    {
+        if (tmp->instructionType[3] > '0')
+        {
+            fprintf(fp," %s\t%d\n", tmp->symbolName , tmp->address );
+        }
+        tmp = tmp-> next;
+    }
+
+    fclose(fp);
+}
+
+
+/* Return the corresponding value of the instruction type */
+int whichInstruct(char type[]) {
     int numTypes;
-    AttributeType types[] = {
-        {".data", 0},
-        {".string", 0},
-        {".code", 1},
-        {".entry", 2},
-        {".extern", 3}
-    };
-
     numTypes = sizeof(types) / sizeof(types[0]);
 
     /* Checking with each type which type is using */
@@ -42,53 +162,12 @@ int attributetype(char type[]) {
     return -1;
 }
 
-
-void printEntriesFile(int i, char *args[], struct symboleTable *tail){
-    FILE * fp;
-    char fname[MAX];
-    struct symbolTable *temp = NULL;
-
-    /* ------------------------ MISSING ---------------*/
-    /* */
-    /* */
-
-
-    fp = fopen(fname, "w");
-    if (fp == NULL) {
-        printf("Failed to open file: %s\n", fname);/* ---------------------CHANGE ---------------*/
-        return;
-    }
-    
-    temp = (struct symbolTable *)malloc(sizeof(struct simboleTable));
-
-
+/* Free the "symbol table" from the memory */
+int freeSymbol(struct symbolTable *symbol) {
+    free(symbol->symbolName);
+    free_list(symbol->instructionType, free);
+    free_list(symbol->next, free);
+    free(symbol);
+    return 0;
 }
 
-
-/* OR */
-
-
-void printentries(int i, char *argv[], struct Stable *tail) {
-    FILE *fp;
-    char fname[MAX];
-    struct Stable *temp = NULL;
-    
-    sprintf(fname, "%s.ent.txt", argv[i]);
-    
-    fp = fopen(fname, "w");
-    if (fp == NULL) {
-        printf("Failed to open file: %s\n", fname);
-        return;
-    }
-    
-    temp = tail->next;
-    fprintf(fp, "Symbol    Value   BaseAddress   Offset    Attributes\n");
-    while (temp != NULL) {
-        if (temp->attributes[2] > 48) {
-            fprintf(fp, " %-10s%-11d%-12d%-8d%-11s\n", temp->symbol, temp->value, temp->baseaddress, temp->offset, printAttributes(temp));
-        }
-        temp = temp->next;
-    }
-    
-    fclose(fp);
-}
