@@ -170,4 +170,3 @@ int freeSymbol(struct symbolTable *symbol) {
     free(symbol);
     return 0;
 }
-
