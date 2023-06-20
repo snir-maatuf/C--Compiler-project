@@ -115,7 +115,8 @@ int firstRead(int i, char *argv[], struct Macro *head)
     fp = fopen(argv[i], "r");
     if (fp == NULL)
     {
-        printf("can't open the file: %s\n\n", argv[i]);
+        printf("Error ! can't open the file);
+        errorsMassages(MISSING_ARGUMENT);
         return 1;
     }
 
