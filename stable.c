@@ -148,7 +148,7 @@ void printExtFile(int i, char * argv[], struct symbolTable *head){
 
 
 /* Return the corresponding value of the instruction type */
-int whichInstruct(char type[]) {
+int getSymbolType(char type[]) {
     int numTypes;
     numTypes = sizeof(types) / sizeof(types[0]);
 
@@ -161,6 +161,20 @@ int whichInstruct(char type[]) {
 
     return -1;
 }
+
+
+char getSymbolChr(char* type) {
+    int i;
+    for (i = 0; i <= 4; i++) {
+        if (strcmp(type, types[i].symbolName) == 0) {
+            return types[i].symbolType[2];
+        }
+    }
+    return '\0'; /* The command not found */
+}
+
+
+
 
 /* Free the "symbol table" from the memory */
 int freeSymbol(struct symbolTable *symbol) {
