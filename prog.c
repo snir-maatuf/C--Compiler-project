@@ -12,6 +12,7 @@ int main(int argc, char *argv[]){
 
 void proccesingFile(int argc, char *argv[]){
     int file_index;
+    int ic,dc;
 
     /* Checking file is recieved */
     if(argc >= 2){
@@ -38,19 +39,4 @@ void proccesingFile(int argc, char *argv[]){
         errorsMassages(MISSING_ARGUMENT);
     }
 }
-
-void build_structs_file(){
-    /* should contains:
-    int IC = 100;
-    int DC = 0;
-    stable_Head?
-    stable_Tail?
-    .
-    .
-    .
-    */
-    
-
-}
-
 
