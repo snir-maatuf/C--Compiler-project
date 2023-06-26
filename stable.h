@@ -9,8 +9,7 @@ struct symbolTable {
     char symbolName [MAX]; 
     int value;
     int address;
-    int offset;
-    char instructionType[5];
+    struct InstructsType type;
     struct symbolTable* next;
 };
 
@@ -29,11 +28,11 @@ struct InstructsType types[] = {
 
 
 
+
 void addSymbolToTable(struct symbolTable * head, char symbol[], int data);
 void addInstructionToTable( char symbol[] ,int type, struct symbolTable * head );
 int getSymbolType(char type[]);
 char getSymbolChr(char* type);
-const char* printInstructionType(struct symbolTable* tmp);
 void printEntFile(int i, char * argv[], struct symbolTable *tail);
 void printExtFile(int i, char * argv[], struct symbolTable *head);
 int getSymbolType(char type[]);
