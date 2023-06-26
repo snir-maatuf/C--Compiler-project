@@ -49,10 +49,38 @@ int isSymbol(char line[], char *ptr, struct symbolTable *shead) {
     return 0;
 }
 
-
-int dcCounter(char line[], int * ptr){
-    
+/* Counting DCstring */
+int dcString(char line[] , int index, struct  Decode* dhead)
+{
+  int dccounter = 0;
+  while(isspace(line[index]))
+    index ++;
+  if (line[index] == 34)
+  {
+    index = index + 1;
+    while (line[index] != 34 && line[index] != '\n' )
+    {
+      index++;
+      dccounter++;
+    }
+  }
+  return dccounter + 1;
+  
 }
+ 
+/* Counting DC*/
+int dcCounter(char line[], int i){
+    int count = 1;
+
+    while (line[i] != '\0')
+    {
+       if(line[i] == 44)
+         count++;
+          i++;
+    }
+    return count ;
+}
+
 
 char *skipSpacesAndTabs(char *str) {
     while (*str == ' ' || *str == '\t') { /* recognize space or tab */
@@ -75,9 +103,9 @@ void removeSpacesAndTabs(char *line) {
 
 /* This func goin though on the all lines in the file */
 int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Decode dhead){
-    int tempDC = 0, tempIC = 100, flag;
+    int tempDC = 0, tempIC = 100, flag, valCounter = 0;
     char fileName[MAX];
-    char * ptr;
+    char * ptr, delim = " \t\n";
     FILE * file;
     char symbolType, *token;
     char line[MAX] = {'\0'};
@@ -117,6 +145,7 @@ int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Dec
             ptr++;
             continue;
         }
+
         
         flag = isSymbol(line,ptr, shead); /* Need to add if its not symbol (what it do?)*/
         
@@ -136,7 +165,7 @@ int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Dec
 
                 /* Initialize the node with values */
                 strcpy(dtemp -> symbolName, temp->symbolName);
-                temp ->value = tempIC;
+                temp ->address = tempIC;
 
                 /* Add node to symbol table */
                 shead ->next = temp;
@@ -150,22 +179,40 @@ int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Dec
                 while(!isspace(line[ptr]) || line[ptr] != '\t'){
                     ptr++;
                 }
-
+                
                 tempDC = tempDC + dcCounter(line, ptr);
+                tempIC = tempIC + dcCounter(line, ptr);
                 
                 break;
             
             case 't': /* =string */
+                
                 /* code */
                 break;
             case 'o': /* = code */
                 /* code */
                 break;
-            case 'n': /* =entry*/
+            case 'n': /* =entry*/ MAIN:
                 /* code */
                 break;
             case 'x': /* =extern*/
-                /* code */
+
+                token = strtok(NULL, delimiters);
+
+                if (token) {
+                    /* Skip on the second token */
+                    token = strtok(NULL, delimiters);
+                    if (token) {
+                        strcpy(temp->symbol, token);
+
+                        /* Copy the symbol name until the end of line */
+                        while ((token = strtok(NULL, ""))) {
+                            strcat(temp->symbol, " ");
+                            strcat(temp->symbol, token);
+                        }
+                    }
+                }
+                
                 break;
             case '\0': /* =isSymbol*/
                 /* code */
@@ -176,7 +223,14 @@ int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Dec
             }
             /* code */
         }
-        
+        else{
+            valCounter = dcCounter() + dcString() ;
+
+            if( valCounter > 0 ){
+                tempDC = tempDC + valCounter;
+                tempIC = tempIC + valCounter;
+            }
+        }
         
         /* ... (All the function on each line ) */
     }
