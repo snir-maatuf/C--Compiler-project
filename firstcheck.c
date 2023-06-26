@@ -6,44 +6,92 @@
 /* isSymbol || enctern&extern || string&data */
 
 /* call to dcode functions from dcode.h */
-int isSymbol();
+
 int stringORdata();
 
+int isSymbolExist(struct symbolTable head,const char* ptr){
+    struct symbolTable* curr = head;
 
-
-
-
-/* ליצור פונ שמדלגת על רווחים  ובנוסף בודקת את סוג הסמל המדויק( .extern\.sting.....)*/
-void removeSpaces(char *str)
-{
-    int i;
-    int count = 0;
-
-    for (i = 0; str[i]; i++)
-    {
-        if (!isspace((char)str[i]))
-            str[count++] = str[i];
+    while (curr != NULL) {
+        if (strcmp(curr->name, name) == 0) {
+            return 1; /* Symbol exists */
+        }
+        curr = curr->next;
     }
 
-    str[count] = '\0';
+    free(curr)
+    return 0;
+}
+
+
+/* should check if the symbol is already in the symbol table */
+int isSymbol(char line[], char *ptr, struct symbolTable *shead) {
+    char *tmp = malloc(MAX * sizeof(char));
+    char *tmpPtr = tmp; /* Pointer to move through tmp */
+    char *linePtr = line; /* Pointer to move through line*/
+
+    while (!isspace(*linePtr) && *linePtr != ':') {
+        *tmpPtr = *linePtr;
+        tmpPtr++;
+        linePtr++;
+    }
+
+    if (*linePtr == ':') {
+        if(isSymbolExist(shead,ptr)){
+            strcpy(temp->symbol,sname);
+        }
+    }
+
+    // Cleanup and free allocated memory
+    free(tmp);
+
+    // Return a value (replace with appropriate return statement)
+    return 0;
+}
+
+
+int dcCounter(char line[], int * ptr){
+
+}
+
+char *skipSpacesAndTabs(char *str) {
+    while (*str == ' ' || *str == '\t') { /* recognize space or tab */
+        str++; /* skip the space or tab */
+    }
+    return str;
+}
+
+/* Return line without spaces and tabs */
+void removeSpacesAndTabs(char *line) {
+    int i, count =0;
+
+    for (i = 0; line[i] != 'ֿֿֿֿֿֿ\0'; i++) {
+        if (!isspace((char)line[i]) && line[i] != '\t' && line[i] != '\n') {
+            line[count++] = line[i];
+        }
+    }
+    line[count] = '\0';
 }
 
 /* This func goin though on the all lines in the file */
-int firstCheck(int x){
-    int DC = 0, IC = 100, flag = 1;
+int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Decode dhead){
+    int tempDC = 0, tempIC = 100, flag;
     char fileName[MAX];
-    int * p = NULL;
+    char * ptr;
     FILE * file;
     char symbolType, *token;
     char line[MAX] = {'\0'};
-    struct  symolTable* shead= NULL;
-    struct  Decode* dhead= NULL;
+    struct  symolTable* syCurr= NULL;
+    struct  Decode* dCurr= NULL;
 
 
 
-    /* Create new decode linkedlist and symbol table */
-    dhead = (struct Decode*)malloc(sizeof(struct Decode));
-    shead = (struct Stable*)malloc(sizeof(struct symbolTable));
+    /* Create new decode NODE and symbol table NODE */
+    syCurr = (struct symbolTable*)malloc(sizeof(struct symbolTable));
+    dCurr = (struct Decode*)malloc(sizeof(struct Decode));
+
+    /* initialize fileName by strcpy func */
+    sprintf(fileName, "%s.am", argv[fileIndex]);
 
     file = fopen(fileName, 'r');
     if (file == NULL)
@@ -51,57 +99,84 @@ int firstCheck(int x){
         printf("Error! Can't opening file: %s\n", file);
     }
 
-    /* initialize fileName by strcpy func */
-    /* missing here the get the file name and insert to fileName */
-    strncat(fileName, ".am", 3);
-
-    token = strtok(line," ");
-
-
 
     /* Read each line and */
-    while (fgets(line, MAX, p)){
-        /* Create a new node of the decode linkedlist and also symbolTable linkedlist node */
+    while (fgets(line, MAX, ptr)){
+        /* Create a new temp node of decode and also symbolTable node */
         struct  Decode* dtemp= NULL;
-        struct  Stable* stemp = NULL;
+        struct  symbolTable* stemp = NULL;
         dtemp = (struct Decode*)malloc(sizeof(struct Decode));
-        stemp = (struct Stable*)malloc(sizeof(struct symbolTable));
+        stemp = (struct symbolTable*)malloc(sizeof(struct symbolTable));
+        flag = 1;
 
+        ptr = skipSpacesAndTabs(ptr);
 
-        /* ignore from spaces */
 
         /* Skip on comment line and empty line */
-        if( *line == ';' || isspace(*line) ){
-            p++;
+        if( *line == ';' ){
+            ptr++;
             continue;
         }
 
-        /* define the completely command name  */
-        symbolType = getSymbolChr(token);
+        flag = isSymbol(line,ptr, shead); /* Need to add if its not symbol (what it do?)*/
 
-        switch (symbolType)
+        /* Return the second chr from the current instruct name */
+        symbolType = getSymbolChr(ptr);
+
+
+
+        if ( isSymbol(line,ptr, shead) || symbolType )
         {
-            case 'a':/* =data */
-                /* check if its data or string */
-                /* code */
-                break;
+            switch (symbolType)
+            {
+                case 'a': /* =data */
+                    /* Add node to Dcode linkedlist */
+                    dhead->next = dtemp;
+                    dhead =  dhead->next;
 
-            case 't': /* =string */
-                /* code */
-                break;
-            case 'o': /* = code */
-                /* code */
-                break;
-            case 'n': /* =entry*/
-                /* code */
-                break;
-            case 'x': /* =extern*/
-                /* code */
-                break;
+                    /* Initialize the node with values */
+                    strcpy(dtemp -> symbolName, temp->symbolName);
+                    temp ->value = tempIC;
 
-            default:
-                break;
+                    /* Add node to symbol table */
+                    shead ->next = temp;
+                    shead =  shead->next;
+
+                    /* Skip on the .data text */
+                    while(isspace(line[ptr]) || line[ptr] != '\t'){
+                        ptr++;
+                    }
+                    /* Skip on spaces and tabs  */
+                    while(!isspace(line[ptr]) || line[ptr] != '\t'){
+                        ptr++;
+                    }
+
+                    tempDC = tempDC + dcCounter(line, ptr);
+
+                    break;
+
+                case 't': /* =string */
+                    /* code */
+                    break;
+                case 'o': /* = code */
+                    /* code */
+                    break;
+                case 'n': /* =entry*/
+                    /* code */
+                    break;
+                case 'x': /* =extern*/
+                    /* code */
+                    break;
+                case '\0': /* =isSymbol*/
+                    /* code */
+                    break;
+
+                default:
+                    break;
+            }
+            /* code */
         }
+
 
         /* ... (All the function on each line ) */
     }
