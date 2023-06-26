@@ -1,7 +1,11 @@
 #include "stable.h"
 
 
-/* Add symbol data to the "Symbol Table" */
+
+
+
+
+/* Add symbol data to node in the "Symbol Table" */
 void addSymbolToTable(struct symbolTable * head, char symbol[], int data){
     struct symbolTable *newSymbol = NULL;
     struct symbolTable *tmp = NULL;
@@ -21,10 +25,9 @@ void addSymbolToTable(struct symbolTable * head, char symbol[], int data){
     }
 
     strcpy(newSymbol->symbolName,symbol);
-    strcpy(tmp->instructionType,"0000");
+    strcpy(tmp->type.symbolName,"none");
     newSymbol->value = data;
     newSymbol->address = data - data %16;
-    tmp->offset = data % 16 ;
     head->next = tmp;
 
     /* tmp pointing to the last node that initialize (we did it up) */
@@ -63,23 +66,6 @@ void addInstructionToTable( char symbol[] ,int type, struct symbolTable * head )
 }
 
 
-/* Return instruction of the current symbol node */
-const char* printInstructionType(struct symbolTable* tmp) {
-    static char new[MAX];
-
-    memset(new, '\0', MAX);
-
-    if (tmp->instructionType[0] > '0')
-        strcat(new, "data ");
-    if (tmp->instructionType[1] > '0')
-        strcat(new, "code ");
-    if (tmp->instructionType[2] > '0')
-        strcat(new, "entry ");
-    if (tmp->instructionType[3] > '0')
-        strcat(new, "extern ");
-    return new;
-}
-
 
 /* Prints the entries to a file */
 void printEntFile(int i, char * argv[], struct symbolTable *head){
@@ -103,7 +89,7 @@ void printEntFile(int i, char * argv[], struct symbolTable *head){
     /* Print each instruction and his location in the memory */
     while( !tmp )
     {
-        if (tmp->instructionType[2] > '0')
+        if (strcmp(tmp->type.symbolName, ".entry" ) == 0 )
         {
             fprintf(fp," %s\t%d\n",tmp->symbolName,tmp->address);
         }
@@ -136,7 +122,7 @@ void printExtFile(int i, char * argv[], struct symbolTable *head){
     /* Print each instruction and his location in the memory */
     while( !tmp )
     {
-        if (tmp->instructionType[3] > '0')
+        if (strcmp(tmp->type.symbolName, ".extern" ) == 0 )
         {
             fprintf(fp," %s\t%d\n", tmp->symbolName , tmp->address );
         }
@@ -163,11 +149,12 @@ int getSymbolType(char type[]) {
 }
 
 
+/* Return the corresponding CHR of the instruction type */
 char getSymbolChr(char* type) {
     int i;
     for (i = 0; i <= 4; i++) {
         if (strcmp(type, types[i].symbolName) == 0) {
-            return types[i].symbolType[2];
+            return types[i].symbolName[2];
         }
     }
     return '\0'; /* The command not found */
@@ -179,7 +166,7 @@ char getSymbolChr(char* type) {
 /* Free the "symbol table" from the memory */
 int freeSymbol(struct symbolTable *symbol) {
     free(symbol->symbolName);
-    free_list(symbol->instructionType, free);
+    free_list(symbol->type, free);
     free_list(symbol->next, free);
     free(symbol);
     return 0;

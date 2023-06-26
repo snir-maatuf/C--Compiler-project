@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "errors.h"
+#include "firstcheck.h"
+#include "secondcheck.h"
 
 
 int main(int argc, char *argv[]);
