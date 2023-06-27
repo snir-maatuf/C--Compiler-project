@@ -9,6 +9,22 @@
 
 int stringORdata();
 
+
+/* Skip on chars until instruction type */
+char * skipToInstructType( char line[], char * ptr){
+
+    /* Skip on the symbol text */
+    while(isspace(line[ptr]) || line[ptr] != '\t'){
+        ptr++;
+    }
+    /* Skip on spaces and tabs  */
+    while(!isspace(line[ptr]) || line[ptr] != '\t'){
+        ptr++;
+    }
+    return ptr;
+}
+
+
 int isSymbolExist(struct symbolTable head,const char* ptr){
     struct symbolTable* curr = head;
 
@@ -50,7 +66,7 @@ int isSymbol(char line[], char *ptr, struct symbolTable *shead) {
 }
 
 /* Counting DCstring */
-int dcString(char line[] , int index, struct  Decode* dhead)
+int dcString(char line[] , int index)
 {
   int dccounter = 0;
   while(isspace(line[index]))
@@ -139,22 +155,34 @@ int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Dec
 
         ptr = skipSpacesAndTabs(ptr);
 
-
         /* Skip on comment line and empty line */
         if( *line == ';' ){
             ptr++;
             continue;
         }
 
-        
+        /* check data or string*/
         flag = isSymbol(line,ptr, shead); /* Need to add if its not symbol (what it do?)*/
+        if (flag)
+        {
+            /* Return the second chr from the current instruct name */
+            symbolType = getSymbolChr(skipToInstructType(line, ptr));
+        }
         
-        /* Return the second chr from the current instruct name */
-        symbolType = getSymbolChr(ptr);
+        
+        /* Check extrn or entrny */
+        if ( getSymbolChr(ptr) == 'e')
+        {
+            symbolType = 'x';
+        }
+        else {
+            symbolType = 'n';
 
+        }
         
 
-        if ( isSymbol(line,ptr, shead) || symbolType )
+
+        if ( flag || symbolType )
         {
             switch (symbolType)
             {
@@ -168,18 +196,12 @@ int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Dec
                 temp ->address = tempIC;
 
                 /* Add node to symbol table */
-                shead ->next = temp;
+                shead->next = temp;
                 shead =  shead->next;
 
-                /* Skip on the .data text */
-                while(isspace(line[ptr]) || line[ptr] != '\t'){
-                    ptr++;
-                }
-                /* Skip on spaces and tabs  */
-                while(!isspace(line[ptr]) || line[ptr] != '\t'){
-                    ptr++;
-                }
-                
+                ptr = skipToInstructType(line,ptr);
+
+                /* Counting the number of the digits */
                 tempDC = tempDC + dcCounter(line, ptr);
                 tempIC = tempIC + dcCounter(line, ptr);
                 
@@ -187,33 +209,64 @@ int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Dec
             
             case 't': /* =string */
                 
-                /* code */
+                /* Add node to Dcode linkedlist */
+                dhead->next = dtemp;
+                dhead =  dhead->next;
+
+                /* Initialize the node with values */
+                strcpy(dtemp -> symbolName, temp->symbolName);
+                temp ->address = tempIC;
+
+                /* Add node to symbol table */
+                shead ->next = temp;
+                shead =  shead->next;
+
+                ptr = skipToInstructType(line,ptr);
+
+                /* Counting the chars in the string */
+                tempDC = tempDC + dcString(line, ptr);
+                tempIC = tempIC + dcString(line, ptr);
+
                 break;
             case 'o': /* = code */
                 /* code */
                 break;
-            case 'n': /* =entry*/ MAIN:
+            case 'n': /* =entry*/
+            /* Pointing on .extern */
+            token = strtok(line, delimiters);
+
+            if (token)
+            {
+                strcat(temp->value, token);
+                /* Jump to the second string */
+                token = strtok(NULL, delimiters);
+        
+                if (token){
+                    strcat(temp->address, tempIC+1 );
+                }
+            }
+            shead->next = temp;
+            shead = shead->next;
                 /* code */
                 break;
             case 'x': /* =extern*/
+            /* Pointing on .extern */
+            token = strtok(line, delimiters);
 
+            if (token)
+            {
+                strcat(temp->value, token);
+                /* Jump to the second string */
                 token = strtok(NULL, delimiters);
-
-                if (token) {
-                    /* Skip on the second token */
-                    token = strtok(NULL, delimiters);
-                    if (token) {
-                        strcpy(temp->symbol, token);
-
-                        /* Copy the symbol name until the end of line */
-                        while ((token = strtok(NULL, ""))) {
-                            strcat(temp->symbol, " ");
-                            strcat(temp->symbol, token);
-                        }
-                    }
+        
+                if (token){
+                    strcat(temp->address, tempIC+1 );
                 }
-                
+            }
+            shead->next = temp;
+            shead = shead->next;
                 break;
+
             case '\0': /* =isSymbol*/
                 /* code */
                 break;
