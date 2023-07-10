@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
 
 void proccesingFile(int argc, char *argv[]){
     int file_index;
-    int ic, dc, flag;
+    int ic =100, dc =0, flag;
 
     /* Checking file is recieved */
     if(argc >= 2){

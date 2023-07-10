@@ -6,9 +6,10 @@
 
 #define MAX 100
 
+const char *instructionsNames[] = {"mov", "cmp", "add","sub", "not", "clr","lea", "inc", "dec","jmp", "bne", "red","prn", "jsr", "rts", "stop"};
+
 int isSymbolExist(struct symbolTable head,const char* ptr);
 int isSymbol();
 char *skipSpacesAndTabs(char *str);
 void removeSpacesAndTabs(char *line);
-int firstCheck(int fileIndex, char *argv[], struct symbolTable *shead, struct Decode *dhead);
-
+int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Decode dhead, int ic, int dc);
