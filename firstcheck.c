@@ -3,12 +3,91 @@
 /* chack the excactly type of instructions (Like: instruction start in point "." and more...) */
 
 /* func that runs on each line the next code: */
-/* isSymbol || enctern&extern || string&data */
+/* isSymbol || entern&extern || string&data */
 
 /* call to dcode functions from dcode.h */
 
 int stringORdata();
 
+whichOpcode(char line[], char * ptr, struct Dcode * dcurr){
+
+    strcpy(dcurr->opcode , opcodeToBinary(ptr));
+}
+
+
+int isImmediate(char line[], char * ptr){
+    /* add line of binary */
+
+}
+int isDirective(char line[], char * ptr){
+
+}
+int isRegister(char line[], char * ptr){
+
+}
+
+
+/* Define and initialize the address destination */
+whichDestination(char line[], char * ptr, struct Dcode * dcurr){
+    char tempLine[MAX] = {'\0'};
+    
+    if (isImmediate())
+    {
+        /* code */
+    }
+    else if (isDirective())
+    {
+        /* code */
+    }else if (isRegister())
+    {
+        /* code */
+    }
+    
+
+    while (isspace(line[ptr]))
+    {
+        ptr++;
+    }
+     
+}
+
+/* Recognize if the given command is assembly command */
+int isInstructionName(char * ptr){
+
+    int i;
+    char *token;
+    token = strtok(ptr, " \t");
+        
+    /* Check if the instruction command is correct */
+    for ( i = 0; i < sizeof(instructionsNames) / sizeof(instructionsNames[0]); i++)
+     {
+        if (strcmp(token, instructionsNames[i]) == 0)
+        {
+            return 0;
+        }
+     }
+
+    /* Instruction is not correct */
+    return 1;
+}
+
+
+
+/* Skip on chars until instruction type */
+char * skipToInstructType( char line[], char * ptr){
+
+    /* Skip on the symbol text */
+    while(isspace(line[ptr]) || line[ptr] != '\t'){
+        ptr++;
+    }
+    /* Skip on spaces and tabs  */
+    while(!isspace(line[ptr]) || line[ptr] != '\t'){
+        ptr++;
+    }
+    return ptr;
+}
+
+/* Check if the given symbol is already in the symbol table */
 int isSymbolExist(struct symbolTable head,const char* ptr){
     struct symbolTable* curr = head;
 
@@ -24,7 +103,7 @@ int isSymbolExist(struct symbolTable head,const char* ptr){
 }
 
 
-/* should check if the symbol is already in the symbol table */
+/* Check if the line is symbol and also already in the symbol table */
 int isSymbol(char line[], char *ptr, struct symbolTable *shead) {
     char *tmp = malloc(MAX * sizeof(char)); 
     char *tmpPtr = tmp; /* Pointer to move through tmp */
@@ -40,19 +119,51 @@ int isSymbol(char line[], char *ptr, struct symbolTable *shead) {
         if(isSymbolExist(shead,ptr)){
             strcpy(temp->symbol,sname);
         }
+        else{
+            free(tmp);
+            return(1);
+        }
     }
     
-    // Cleanup and free allocated memory
+    /* Cleanup and free allocated memory */
     free(tmp);
 
-    // Return a value (replace with appropriate return statement)
+    /*Return a value (replace with appropriate return statement)*/
     return 0;
 }
 
-
-int dcCounter(char line[], int * ptr){
-    
+/* Counting DCstring */
+int dcString(char line[] , int index)
+{
+  int dccounter = 0;
+  while(isspace(line[index]))
+    index ++;
+  if (line[index] == 34)
+  {
+    index = index + 1;
+    while (line[index] != 34 && line[index] != '\n' )
+    {
+      index++;
+      dccounter++;
+    }
+  }
+  return dccounter + 1;
+  
 }
+ 
+/* Counting DC*/
+int dcCounter(char line[], int i){
+    int count = 1;
+
+    while (line[i] != '\0')
+    {
+       if(line[i] == 44)
+         count++;
+          i++;
+    }
+    return count ;
+}
+
 
 char *skipSpacesAndTabs(char *str) {
     while (*str == ' ' || *str == '\t') { /* recognize space or tab */
@@ -74,16 +185,16 @@ void removeSpacesAndTabs(char *line) {
 }
 
 /* This func goin though on the all lines in the file */
-int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Decode dhead){
-    int tempDC = 0, tempIC = 100, flag;
+int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Decode dhead, int ic, int dc){
+    int tempDC = dc, tempIC = ic, flag, valCounter = 0;
     char fileName[MAX];
-    char * ptr;
+    char * ptr, delim = " \t\n,";
     FILE * file;
     char symbolType, *token;
     char line[MAX] = {'\0'};
     struct  symolTable* syCurr= NULL;
     struct  Decode* dCurr= NULL;
-
+    struct  Decode* dtail= NULL;
     
 
     /* Create new decode NODE and symbol table NODE */
@@ -111,76 +222,201 @@ int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Dec
 
         ptr = skipSpacesAndTabs(ptr);
 
-
         /* Skip on comment line and empty line */
         if( *line == ';' ){
             ptr++;
             continue;
         }
-        
+
+        /* check data or string*/
         flag = isSymbol(line,ptr, shead); /* Need to add if its not symbol (what it do?)*/
+        if (flag)
+        {
+            /* Return the second chr from the current instruct name, else return null */
+            symbolType = getSymbolChr(skipToInstructType(line, ptr));
+        }
         
-        /* Return the second chr from the current instruct name */
-        symbolType = getSymbolChr(ptr);
-
         
+        /* Check extrn or entrny, else return null */
+        if ( getSymbolChr(ptr) == 'e')
+        {
+            symbolType = 'x';
+        }
+        else {
+            symbolType = 'n';
+        }
+        
+         
 
-        if ( isSymbol(line,ptr, shead) || symbolType )
+        if ( flag || symbolType)
         {
             switch (symbolType)
             {
             case 'a': /* =data */
+                
+                /* check if the symbol is already exist, else break */
+                if(!isSymbolExist){
+                    break;
+                }
+
                 /* Add node to Dcode linkedlist */
                 dhead->next = dtemp;
                 dhead =  dhead->next;
 
                 /* Initialize the node with values */
                 strcpy(dtemp -> symbolName, temp->symbolName);
-                temp ->value = tempIC;
+                temp ->address = tempIC;
+
+                /* Add node to symbol table */
+                shead->next = temp;
+                shead =  shead->next;
+
+                /* check which operand source (1,3,5) */
+
+                ptr = skipToInstructType(line,ptr);
+
+                /* Counting the number of the digits */
+                tempDC = tempDC + dcCounter(line, ptr);
+                tempIC = tempIC + dcCounter(line, ptr);
+                
+                break;
+            
+            case 't': /* =string */
+
+                /* check if the symbol is already exist, else break */
+                if(!isSymbolExist){
+                    break;
+                }
+                
+                /* Add node to Dcode linkedlist */
+                dhead->next = dtemp;
+                dhead =  dhead->next;
+
+                /* Initialize the node with values */
+                strcpy(dtemp -> symbolName, temp->symbolName);
+                temp ->address = tempIC;
 
                 /* Add node to symbol table */
                 shead ->next = temp;
                 shead =  shead->next;
 
-                /* Skip on the .data text */
-                while(isspace(line[ptr]) || line[ptr] != '\t'){
-                    ptr++;
-                }
-                /* Skip on spaces and tabs  */
-                while(!isspace(line[ptr]) || line[ptr] != '\t'){
-                    ptr++;
-                }
+                ptr = skipToInstructType(line,ptr);
 
-                tempDC = tempDC + dcCounter(line, ptr);
-                
+                /* Counting the chars in the string */
+                tempDC = tempDC + dcString(line, ptr);
+                tempIC = tempIC + dcString(line, ptr);
+
                 break;
-            
-            case 't': /* =string */
-                /* code */
-                break;
-            case 'o': /* = code */
-                /* code */
-                break;
+
             case 'n': /* =entry*/
+            /* Pointing on .entry */
+            token = strtok(line, delim);
+
+            if (token)
+            {
+                strcat(temp->value, token);
+                /* Jump to the second string */
+                token = strtok(NULL, delim);
+        
+                if (token){
+                    strcat(temp->address, tempIC+1 );
+                }
+            }
+            shead->next = temp;
+            shead = shead->next;
                 /* code */
                 break;
+                
             case 'x': /* =extern*/
-                /* code */
-                break;
-            case '\0': /* =isSymbol*/
-                /* code */
+            /* Pointing on .extern */
+            token = strtok(line, delim);
+
+            if (token)
+            {
+                strcat(temp->value, token);
+                /* Jump to the second string */
+                token = strtok(NULL, delim);
+        
+                if (token){
+                    strcat(temp->address, tempIC+1 );
+                }
+            }
+            shead->next = temp;
+            shead = shead->next;
                 break;
 
-            default:
+            default: /* = code */
+
+            /* check if the symbol is already exist, else break */
+            if(!isSymbolExist){
                 break;
             }
-            /* code */
+            token = strtok(line, delim);
+            
+            
+            /* Add node to Dcode linkedlist */
+            dhead->next = dtemp;
+            dhead =  dhead->next;
+
+            /* Initialize the node with values */
+            strcpy(dtemp -> symbolName, ".code");
+            temp ->address = tempIC;
+
+            /* Add node to symbol table */
+            shead ->next = temp;
+            shead =  shead->next;
+
+            /* Print error if the instruction name is not assembly command */
+            if (!isInstructionName(ptr))
+            {
+                errorMassage(WRONG_INSTRUCTION_NAME);
+            }
+            
+            /* consider to initialize ARE to 00 */
+
+            whichOpcode(char line[], char * ptr, struct Dcode * dcurr);
+            whichDestination(char line[], char * ptr, struct Dcode * dcurr);
+             
+            /* Counting the number of the data and instruction in the line */
+            while (token != NULL) {
+                strcat(temp->address, tempIC+1 );
+                token = strtok(NULL, delim);
+            }
+
+            /* Updating the IC */
+            tempIC = temp->address;
+
+                break;
+            }
+            
         }
-        
+        else{ /* =not a symbol */ 
+
+            if(isInstructionName(ptr)){
+                valCounter = dcCounter() + dcString();
+
+                /* should be here the declaration of struct */
+
+                if( valCounter > 0 ){
+                    tempDC = tempDC + valCounter;
+                    tempIC = tempIC + valCounter;
+                }
+
+            }
+        }
         
         /* ... (All the function on each line ) */
     }
-    fclose(file);
+
+    fclose(fileName);
+
+    /* initialize NULL for decode linkedlist */
+    dtail = (struct Decode*)malloc(sizeof(struct Decode));
+    dhead ->next = dtail;
+
+    ic = tempIC;
+    dc = tempDC;
+    
 
     return flag; 
 }

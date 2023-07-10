@@ -21,9 +21,8 @@ struct InstructsType {
 struct InstructsType types[] = {
         {".data", 0},
         {".string", 0},
-        {".code", 1},
-        {".entry", 2},
-        {".extern", 3}
+        {".entry", 1},
+        {".extern", 2}
     };
 
 
