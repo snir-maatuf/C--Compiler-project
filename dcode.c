@@ -44,24 +44,17 @@ char* opcodeToBinary(char *ptr)
 }
 
 /* Define the instruction group  */
-const char* instructionGroup(char line[], char * p)
+int instructionGroup(char line[], char * p)
 {
-  char *p;
-  char new[5];
-  memset(new , '\0' , 5);
-  if(!strcmp(op, "add") || !strcmp(op, "clr") || !strcmp(op, "jmp"))
-    strcpy(new,"1010");
+  if(!strcmp(line, "mov") ||!strcmp(line, "cmp")|| !strcmp(line, "add")||!strcmp(line, "sub")|| !strcmp(line, "lea"))
+    return 1;
   else
-  if(!strcmp(op, "sub") || !strcmp(op, "not") || !strcmp(op, "bne"))
-    strcpy(new,"1011");
+  if(!strcmp(line, "not") || !strcmp(line, "clr") || !strcmp(line, "bne") || !strcmp(line, "dec")||
+         !strcmp(line, "inc")|| !strcmp(line, "jmp")|| !strcmp(line, "red")|| !strcmp(line, "prn")|| !strcmp(line, "jsr"))
+    return 2;
   else
-  if(!strcmp(op, "inc") || !strcmp(op, "jsr"))
-    strcpy(new,"1100");
-  else
-  if(!strcmp(op, "dec"))
-    strcpy(new,"1101");
-  else
-    strcpy(new,"0000");
- p = new;
-  return p;
+  if(!strcmp(line, "rts") || !strcmp(line, "stop"))
+    return 3;
+    
+  return -1;
 }

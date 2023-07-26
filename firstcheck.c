@@ -9,6 +9,7 @@
 
 int stringORdata();
 
+
 whichOpcode(char line[], char * ptr, struct Dcode * dcurr){
 
     strcpy(dcurr->opcode , opcodeToBinary(ptr));
@@ -16,8 +17,14 @@ whichOpcode(char line[], char * ptr, struct Dcode * dcurr){
 
 
 int isImmediate(char line[], char * ptr){
+    
     /* add line of binary */
 
+    if (isdigit(ptr) || (ptr =='-' && isdigit(++ptr) ))
+        {
+            return 0;
+        }
+    return 1;
 }
 int isDirective(char line[], char * ptr){
 
@@ -31,14 +38,44 @@ int isRegister(char line[], char * ptr){
 whichDestination(char line[], char * ptr, struct Dcode * dcurr){
     char tempLine[MAX] = {'\0'};
     
-    if (isImmediate())
+                
+    if (isImmediate(line, ptr))
     {
-        /* code */
+        /* check the second oprand */
+        while (isspace(line[ptr]))
+        {
+            ptr++;
+        }
+        while(!isspace(line[ptr]) && line[ptr] != ','){
+            ptr++;
+        }
+        /* skip on comma */
+        while (isspace(line[++ptr]))
+        {
+            ptr++;
+        }
+
+        if(line[ptr] == '@') /* directive register address */
+        {
+            /* need to add here node and also to coding to binary */
+        }
+        else if (isdigit(ptr) || (ptr =='-' && isdigit(++ptr) )) /* immediate address */
+            {
+                /* need to add here node and also to coding to binary */
+            }
+            else if (isSymbolExist)
+            {
+                /* code */
+            }
+
+    return 1;
     }
-    else if (isDirective())
+        
+    }
+    else if (isDirective(line,ptr))
     {
         /* code */
-    }else if (isRegister())
+    }else if (isRegister(line, ptr))
     {
         /* code */
     }
@@ -93,13 +130,13 @@ int isSymbolExist(struct symbolTable head,const char* ptr){
 
     while (curr != NULL) {
         if (strcmp(curr->name, name) == 0) {
-            return 1; /* Symbol exists */
+            return 0;
         }
         curr = curr->next;
     }
 
     free(curr)
-    return 0;
+    return 1; /* Symbol is not exists */
 }
 
 
@@ -186,7 +223,7 @@ void removeSpacesAndTabs(char *line) {
 
 /* This func goin though on the all lines in the file */
 int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Decode dhead, int ic, int dc){
-    int tempDC = dc, tempIC = ic, flag, valCounter = 0;
+    int tempDC = dc, tempIC = ic, flag, valCounter = 0, tmp1;
     char fileName[MAX];
     char * ptr, delim = " \t\n,";
     FILE * file;
@@ -371,6 +408,32 @@ int firstCheck(int fileIndex, char *argv[], struct symbolTable shead, struct Dec
             {
                 errorMassage(WRONG_INSTRUCTION_NAME);
             }
+
+            /* define which command group */ 1?3?5?
+            *p = token;
+            tmp1 = instructionGroup(line,token );
+            if ( tmp1 == 1)
+            {
+                /* skip on first instruction word */
+                token = strtok(NULL, delim);
+                *p=token;
+                /* check the type of the operands */
+                whichDestination(line, p, dtemp)
+
+
+                
+            } else if (tem1 == 2)
+            {
+                /* code */
+            } else if (temp1 == 3)
+            {
+                /* code */
+            }
+
+            
+
+
+            /* 1= one line (ic+=1) or 3= 3 line(ic+=3)... */
             
             /* consider to initialize ARE to 00 */
 
