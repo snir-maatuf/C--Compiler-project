@@ -7,9 +7,9 @@
 
 struct symbolTable {
     char symbolName [MAX]; 
-    int value;
+    int value; // need to delete
     int address;
-    struct InstructsType type;
+    struct InstructsType type; //need to delete
     struct symbolTable* next;
 };
 
