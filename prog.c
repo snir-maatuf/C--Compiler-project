@@ -12,30 +12,29 @@ int main(int argc, char *argv[]){
 
 
 void proccesingFile(int argc, char *argv[]){
-    int file_index;
+    int fileIndex;
     int ic =100, dc =0, flag;
 
     /* Checking file is recieved */
     if(argc >= 2){
-        for(file_index = 1; file_index < argc; file_index++)
+        for(fileIndex = 1; fileIndex < argc; fileIndex++)
         {
-            /* Builds a struct to one file */
-            buildStructsFile();
-
-            /* Before first run (implement macros read them)*/
-            flag = /* execute macro function */ ;
+            struct Macro * Mhead = buildStructsFile()
+            /* Builds a structs */
+            /* Before first run (implement macros read and write the macro)*/
+            flag = preFile(fileIndex, argv, Mhead);
 
             /* first run on code */
-            if (!flag)
+            if (flag == 0)
             {
                 /* execute here macro func (write them to file)*/
-                flag = firstcheck(file_index, argv);
+                flag = firstcheck(fileIndex, argv, &ic, &dc);
             }
 
             /* second run on code */
-            if (!flag)
+            if (flag == 0)
             {
-                secondcheck();
+                secondcheck(fileIndex, argv, &ic, &dc);
             }
 
 
@@ -47,13 +46,16 @@ void proccesingFile(int argc, char *argv[]){
 }
 
 
-void buildStructsFile(){
-    struct  symbolTable* table = NULL;
-    struct  Decode* dhead = NULL;
+struct Macro * buildStructsFile(){
+    struct symbolTable* table = NULL;
+    struct Decode* dhead = NULL;
+    struct Macro* Mhead = NULL;
 
-    table = (symbolTable*)malloc(sizeof(symbolTable));
+    table = (struct symbolTable*)malloc(sizeof(symbolTable));
     dhead = (struct Decode*)malloc(sizeof(struct Decode));
-    
+    Mhead = (struct Macro*)malloc(sizeof(struct Macro));
+
+    return Mhead;
 }
 
 

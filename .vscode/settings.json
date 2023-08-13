@@ -18,6 +18,24 @@
         "tuple": "c",
         "type_traits": "c",
         "vector": "c",
-        "typeinfo": "c"
-    }
+        "typeinfo": "c",
+        "__locale": "c",
+        "__hash_table": "c",
+        "__tuple": "c",
+        "array": "c",
+        "compare": "c",
+        "variant": "c"
+    },
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.default.cStandard": "c89",
+    "C_Cpp.autocompleteAddParentheses": true,
+    "C_Cpp.inlayHints.autoDeclarationTypes.enabled": true,
+    "C_Cpp.inlayHints.referenceOperator.enabled": true,
+    "C_Cpp.inlayHints.referenceOperator.showSpace": true,
+    "C_Cpp.intelliSenseEngine": "Tag Parser",
+    "C_Cpp.intelliSenseEngineFallback": "enabled",
+    "C_Cpp.inlayHints.parameterNames.enabled": true,
+    "C_Cpp.inlayHints.autoDeclarationTypes.showOnLeft": true,
+    "C_Cpp.default.intelliSenseMode": "macos-clang-arm64",
+    "C_Cpp.workspaceSymbols": "Just My Code",
 }

@@ -3,11 +3,12 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#define MAX 100
+
+#define MAX 31
+
 
 struct symbolTable {
-    char symbolName [MAX]; 
-    int value; // need to delete
+    char symbolName[MAX]; 
     int address;
     struct InstructsType type; //need to delete
     struct symbolTable* next;
@@ -18,21 +19,19 @@ struct InstructsType {
     int value;
 };
 
+
 struct InstructsType types[] = {
-        {".data", 0},
-        {".string", 0},
-        {".entry", 1},
-        {".extern", 2}
-    };
-
-
-
+    {".data", 0},
+    {".string", 0},
+    {".entry", 1},
+    {".extern", 2}
+};
 
 void addSymbolToTable(struct symbolTable * head, char symbol[], int data);
-void addInstructionToTable( char symbol[] ,int type, struct symbolTable * head );
-int getSymbolType(char type[]);
-char getSymbolChr(char* type);
-void printEntFile(int i, char * argv[], struct symbolTable *tail);
+void addInstructionToTable( char symbol[] , struct symbolTable * head );
+void printEntFile(int i, char * argv[], struct symbolTable *head);
 void printExtFile(int i, char * argv[], struct symbolTable *head);
 int getSymbolType(char type[]);
+char getSymbolChr(char* type);
+int isSymbolExist(char* ptr);
 int freeSymbol(struct symbolTable *symbol);

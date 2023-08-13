@@ -115,7 +115,7 @@ int firstRead(int i, char *argv[], struct Macro *head)
     fp = fopen(argv[i], "r");
     if (fp == NULL)
     {
-        printf("Error ! can't open the file);
+        printf("Error ! can't open the file");
         errorsMassages(MISSING_ARGUMENT);
         return 1;
     }
@@ -169,7 +169,7 @@ int isCall(char line[], FILE *fpw, struct Macro *tail)
     return 0;
 }
 
-void preFile(int i, char *argv[], struct Macro *tail)
+int preFile(int i, char *argv[], struct Macro *tail)
 {
     int macroflag = 0;
     FILE *fpw;
@@ -178,6 +178,8 @@ void preFile(int i, char *argv[], struct Macro *tail)
     char fname[MAX];
     char fname2[MAX];
     int lineLength;
+
+
     strcpy(fname, argv[i]);
     strcpy(fname2, argv[i]);
     strncat(fname2, ".am", 3);
@@ -186,15 +188,15 @@ void preFile(int i, char *argv[], struct Macro *tail)
     if (fpr == NULL)
     {
         printf("Can't open the file: %s \n \n", argv[i]);
-        return;
+        return 1;
     }
 
     while (fgets(line, MAX, fpr))
     {
         lineLength = strlen(line);
-        if (line[lineLength - 1] == '\n')
+        if (line[lineLength - 1] == '\n'){
             line[lineLength - 1] = '\0';
-
+        }
         if (!macroflag)
         {
             if (!isCall(line, fpw, tail))
@@ -218,4 +220,5 @@ void preFile(int i, char *argv[], struct Macro *tail)
 
     fclose(fpw);
     fclose(fpr);
+    return 0;
 }
