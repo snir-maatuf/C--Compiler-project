@@ -1,4 +1,4 @@
-
+#include "dcode.h"
 
 
 /*Returns the opcode number of the instructions as a binary number*/
@@ -6,6 +6,7 @@ char* opcodeToBinary(char *ptr)
 {
     char *p;
     char tmp[5];
+    
     strcpy(tmp, "0000");
     if(!strcmp(ptr, "mov"))
         strcpy(tmp,"0000");
@@ -55,6 +56,21 @@ int instructionGroup(char line[], char * p)
   else
   if(!strcmp(line, "rts") || !strcmp(line, "stop"))
     return 3;
-    
+
   return -1;
+}
+
+/* Add node the the dcode table */
+Dcode * appendNode(struct Dcode * dcurr )
+{
+    struct  Decode* newNode= NULL;
+
+    while (dcurr->next != NULL) {
+            dcurr = dcurr->next;
+    }
+
+    /* Add the new node to the end */
+    dcurr->next = newNode;
+    
+    return newNode;
 }

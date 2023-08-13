@@ -2,13 +2,11 @@
 
 
 
-
-
-
 /* Add symbol data to node in the "Symbol Table" */
 void addSymbolToTable(struct symbolTable * head, char symbol[], int data){
     struct symbolTable *newSymbol = NULL;
     struct symbolTable *tmp = NULL;
+    
 
 
     /* Check if the symbol is already exists */
@@ -38,7 +36,7 @@ void addSymbolToTable(struct symbolTable * head, char symbol[], int data){
 
 
 /*  Add symbols to the table */
-void addInstructionToTable( char symbol[] ,int type, struct symbolTable * head ){
+void addInstructionToTable( char symbol[] , struct symbolTable * head ){
     struct symbolTable *newSymbol = NULL;
     struct symbolTable * tmp = head;
 
@@ -136,14 +134,15 @@ void printExtFile(int i, char * argv[], struct symbolTable *head){
 /* Return the corresponding value of the instruction type */
 int getSymbolType(char type[]) {
     int numTypes;
+    int i;
     numTypes = sizeof(types) / sizeof(types[0]);
 
     /* Checking with each type which type is using */
-    for (int i = 0; i < numTypes; i++) {
+    for (i = 0; i < numTypes; i++) {
         if ( !strcmp(type, types[i].symbolName) ) {
             return types[i].value;
         }
-    }
+    } 
 
     return -1;
 }
@@ -152,7 +151,7 @@ int getSymbolType(char type[]) {
 /* Return the corresponding CHR of the instruction type */
 char getSymbolChr(char* type) {
     int i;
-    for (i = 0; i <= 4; i++) {
+    for (i = 0; i <= 3; i++) {
         if (strcmp(type, types[i].symbolName) == 0) {
             return types[i].symbolName[2];
         }
@@ -160,7 +159,32 @@ char getSymbolChr(char* type) {
     return '\0'; /* The command not found */
 }
 
+/* Check if the given symbol is already in the symbol table */
+int isSymbolExist(char* ptr){
+    char * labelName[];
+    struct symbolTable SymbolTableNode;
+    int wordLength = 0;
+    
 
+    while (*ptr && isalpha(*ptr)) {
+        wordLength++;
+    }
+
+    for (int i = 0; i < wordLength && i < 32; i++) {
+        labelName[i] = ptr;
+        ptr++;
+    }
+    
+    while (SymbolTableNode->symbolName != NULL) {
+        if (strncmp(SymbolTableNode->symbolName, labelName, wordLength)) {
+            return 0;
+        }
+        SymbolTableNode = SymbolTableNode->next;
+    }
+
+    free(curr)
+    return 1; /* Symbol is not exists */
+}
 
 
 /* Free the "symbol table" from the memory */
