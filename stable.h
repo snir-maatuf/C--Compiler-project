@@ -8,7 +8,7 @@
 
 
 struct symbolTable {
-    char symbolName[MAX]; 
+    char symbolName[MAX_LABLE]; 
     int address;
     struct InstructsType type; //need to delete
     struct symbolTable* next;
