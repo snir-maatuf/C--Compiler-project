@@ -1,5 +1,6 @@
 #include "stable.h"
 
+#define MAX_LABLE 31
 
 
 /* Add symbol data to node in the "Symbol Table" */
@@ -12,19 +13,18 @@ void addSymbolToTable(struct symbolTable * head, char symbol[], int data){
     /* Check if the symbol is already exists */
     for (tmp = head; tmp!= NULL; tmp = tmp->next){
         if (!(strcmp(tmp->symbolName, symbol))) {
-            exit(0); /*-------------------- SET ERROR CONST ----------------------- */
+            exit(0);
         }
     }
     
     newSymbol = (struct symbolTable*)malloc(sizeof(struct symbolTable));
-
     if(!head){
-        exit(0);  /*-------------------- SET ERROR CONST ----------------------- */
+        errorsMassages(MEMORY_ALLOCAION_FAILED);
+        exit(0);
     }
 
     strcpy(newSymbol->symbolName,symbol);
     strcpy(tmp->type.symbolName,"none");
-    newSymbol->value = data;
     newSymbol->address = data - data %16;
     head->next = tmp;
 
@@ -42,7 +42,7 @@ void addInstructionToTable( char symbol[] , struct symbolTable * head ){
 
     newSymbol = (struct symbolTable*)malloc(sizeof(struct symbolTable));
     if (!newSymbol) {
-        fprintf(stderr, "Memory allocation failed.\n"); /*-------------------- SET ERROR CONST ----------------------- */
+        errorsMassages(MEMORY_ALLOCAION_FAILED);
         exit(0);
     }
     
@@ -170,7 +170,7 @@ int isSymbolExist(char* ptr){
         wordLength++;
     }
 
-    for (int i = 0; i < wordLength && i < 32; i++) {
+    for (int i = 0; i < wordLength && i < MAX_LABLE; i++) {
         labelName[i] = ptr;
         ptr++;
     }
